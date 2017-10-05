@@ -1,0 +1,30 @@
+{
+  "brain": {
+    "type": "rbm",
+    "learning_rate": 0.1,
+    "beta_0": 1,
+    "beta_1": 10,
+    "beta_schedule": "exponential",
+    "gibbs_rate": 1,
+    "discount_factor": 0.95,
+    "init_std": 0.01,
+    "num_hiddens": 4,
+    "encoding": "1-hot"
+  },
+  "global": {
+    "max_actions": 500000,
+    "exploration_rate": 0.7,
+    "max_age": 20,
+    "recent_wins_epoch": 100000,
+    "average_reward_epoch": 1000,
+    "dance_reincs": 0,
+    "dance_max_age": 20
+  },
+  "task": {
+    "name": "bt",
+    "num_blockers": 2,
+    "grid_y": 4,
+    "positive_reward": 1,
+    "negative_reward": 0
+  }
+}

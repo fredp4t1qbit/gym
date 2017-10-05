@@ -35,6 +35,6 @@ setup(name='gym',
           'numpy>=1.10.4', 'requests>=2.0', 'six', 'pyglet>=1.2.0',
       ],
       extras_require=extras,
-      package_data={'gym': ['envs/mujoco/assets/*.xml', 'envs/classic_control/assets/*.png']},
+      package_data={'gym': ['envs/mujoco/assets/*.xml', 'envs/classic_control/assets/*.png', 'envs/nysaq/config']},
       tests_require=['pytest', 'mock'],
 )
