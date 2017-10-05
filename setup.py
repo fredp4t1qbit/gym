@@ -42,7 +42,8 @@ setup(name='gym',
         'envs/robotics/assets/hand/*.xml',
         'envs/robotics/assets/stls/fetch/*.stl',
         'envs/robotics/assets/stls/hand/*.stl',
-        'envs/robotics/assets/textures/*.png']
+        'envs/robotics/assets/textures/*.png',
+        'envs/nysaq/config']
       },
       tests_require=['pytest', 'mock'],
 )

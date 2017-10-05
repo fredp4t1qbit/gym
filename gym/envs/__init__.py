@@ -47,6 +47,22 @@ register(
     reward_threshold=25.0,
 )
 
+# nySAq
+# ----------------------------------------
+register(
+    id='KBlocker-v0',
+    entry_point='gym.envs.nysaq:KBlockerEnv',
+    max_episode_steps=20,
+    reward_threshold=1.5,
+)
+
+# register(
+#     id='KBlocker-v1',
+#     entry_point='gym.envs.nysaq:KBlockerEnv',
+#     max_episode_steps=40,
+#     reward_threshold=0.19,
+# )
+
 # Classic
 # ----------------------------------------
 

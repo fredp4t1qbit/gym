@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+import gym
+from gym import envs
+envids = [spec.id for spec in envs.registry.all()]
+for envid in sorted(envids):
+    try:
+        env = gym.make(envid)
+        print 'action space: ', type(env.action_space)
+        print 'observation space: ', type(env.observation_space)
+        print '------------'
+    except:
+        print 'Skipping ', envid
