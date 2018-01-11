@@ -21,7 +21,7 @@ class KBlockerEnv(gym.Env):
 
         self.__attacks = []
         self._NUM_ACTIONS = 4;
-
+        self._REWARD = 10;
         # 0: right, 1: left, 2: down, 3: up
         self.action_space = spaces.Discrete(self._NUM_ACTIONS ** (self.__num_bs + 1))
 
@@ -62,14 +62,14 @@ class KBlockerEnv(gym.Env):
         return coord if (tnew in self.__coords) else tnew
 
     def __defend__(self):
+
         if self.__gap not in self.__attacks:
             return self.__gap
 
-        init_gap = self.__gap
-        for i in range(init_gap - 3, -1, -3):
+        for i in range(self.__gap - 3, -1, -3):
             if i not in self.__attacks:
                 return i
-        for i in range(init_gap + 3, self.__grid_x, 3):
+        for i in range(self.__gap + 3, self.__grid_x, 3):
             if i not in self.__attacks:
                 return i
 
@@ -98,12 +98,8 @@ class KBlockerEnv(gym.Env):
         for i in range(len(self.__coords)):
             self.__coords[i] = self.__coord_after__(sep_actions[i], self.__coords[i])
 
-        reward = any(c[1] == self.__grid_y - 1 for c in self.__coords)
-        done = reward > 0
+        done = any(c[1] == self.__grid_y - 1 for c in self.__coords)
 
         state = np.array(list(map(self.__encode__, self.__coords)))
 
-        if reward > 0:
-            return state, 10, True, {}
-
-        return state, 0, False, {}
+        return state, self._REWARD * done, done, {}
