@@ -51,7 +51,7 @@ def test_coords(cc, action, nc):
 
 # winning
 @pytest.mark.parametrize("cc, action, exp_rew, exp_done", [
-    ([(0,3),(3,3)], 15, 1, True)#action : (3,3)
+    ([(0,3),(3,3)], 15, 10, True)#action : (3,3)
 ])
 def test_winning(cc, action, exp_rew, exp_done):
     fileName = 'rbmConfig1bt'
