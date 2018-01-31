@@ -11,6 +11,8 @@ class KBlockerEnv(gym.Env):
         with open(config_path) as data_file:
             self.config = json.load(data_file)
 
+        self.__ep_ctr = 0
+
         self.__num_bs = self.config['task']['num_blockers']
         self.__grid_y = self.config['task']['grid_y']
         self.__grid_x = self.__num_bs * 3 + 1
@@ -20,8 +22,10 @@ class KBlockerEnv(gym.Env):
         self._seed()
 
         self.__attacks = []
-        self._NUM_ACTIONS = 4;
-        self._REWARD = 10;
+        self._NUM_ACTIONS = 4
+        self._REWARD = 1
+        self._MAX_EPISODE = 20
+
         # 0: right, 1: left, 2: down, 3: up
         self.action_space = spaces.Discrete(self._NUM_ACTIONS ** (self.__num_bs + 1))
 
@@ -80,6 +84,8 @@ class KBlockerEnv(gym.Env):
         return seed
 
     def _reset(self):
+        self.__ep_ctr = 0
+
         self.__gap = 0
         # Initialize the agents randomly
         self.__coords = [(r, 0) for r in random.sample(range(self.__grid_x), self.__num_bs + 1)]
@@ -88,6 +94,8 @@ class KBlockerEnv(gym.Env):
 
     def _step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+
+        self.__ep_ctr += 1
 
         # Let the blockers defend
         self.__attacks = [x[0] for x in self.__coords if x[1] == self.__grid_y - 2]
@@ -98,8 +106,9 @@ class KBlockerEnv(gym.Env):
         for i in range(len(self.__coords)):
             self.__coords[i] = self.__coord_after__(sep_actions[i], self.__coords[i])
 
-        done = any(c[1] == self.__grid_y - 1 for c in self.__coords)
+        won = any(c[1] == self.__grid_y - 1 for c in self.__coords)
 
         state = np.array(list(map(self.__encode__, self.__coords)))
 
-        return state, self._REWARD * done, done, {}
+        return state, self._REWARD * won, won, {}
+        # return state, self._REWARD * (2 * won) - 1, won, {}
