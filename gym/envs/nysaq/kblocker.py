@@ -13,6 +13,13 @@ class KBlockerEnv(gym.Env):
 
         self.__ep_ctr = 0
 
+        # Every _SAMPLE_TRAJ_INTERVAL episodes, print one.
+        self._PRINT_TRAJ_SAMPLES = False
+        if self._PRINT_TRAJ_SAMPLES:
+            self._traj_file = open('trajs.txt', 'w')
+        self._SAMPLE_TRAJ_INTERVAL = 100
+        self.__traj_sample_ctr = -1
+
         self.__num_bs = self.config['task']['num_blockers']
         self.__grid_y = self.config['task']['grid_y']
         self.__grid_x = self.__num_bs * 3 + 1
@@ -23,7 +30,7 @@ class KBlockerEnv(gym.Env):
 
         self.__attacks = []
         self._NUM_ACTIONS = 4
-        self._REWARD = 1
+        self._REWARD = 5
         self._MAX_EPISODE = 20
 
         # 0: right, 1: left, 2: down, 3: up
@@ -86,7 +93,15 @@ class KBlockerEnv(gym.Env):
     def _reset(self):
         self.__ep_ctr = 0
 
+        if self._PRINT_TRAJ_SAMPLES and not self.__traj_sample_ctr % self._SAMPLE_TRAJ_INTERVAL:
+            self._traj_file.write('-----------------')
+            self._traj_file.write(os.linesep)
+            self._traj_file.flush()
+
+        self.__traj_sample_ctr += 1
+
         self.__gap = 0
+
         # Initialize the agents randomly
         self.__coords = [(r, 0) for r in random.sample(range(self.__grid_x), self.__num_bs + 1)]
 
@@ -94,6 +109,12 @@ class KBlockerEnv(gym.Env):
 
     def _step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+
+        # If won, stay for one move here (regardless of action), return no reward and declare win
+        won_already = any(c[1] == self.__grid_y - 1 for c in self.__coords)
+        if won_already:
+            state = np.array(list(map(self.__encode__, self.__coords)))
+            return state, 0, True, {}
 
         self.__ep_ctr += 1
 
@@ -106,9 +127,15 @@ class KBlockerEnv(gym.Env):
         for i in range(len(self.__coords)):
             self.__coords[i] = self.__coord_after__(sep_actions[i], self.__coords[i])
 
+            if self._PRINT_TRAJ_SAMPLES and not self.__traj_sample_ctr % self._SAMPLE_TRAJ_INTERVAL:
+                self._traj_file.write(str(self.__coords[i]) + ' # ')
+
+        if self._PRINT_TRAJ_SAMPLES and not self.__traj_sample_ctr % self._SAMPLE_TRAJ_INTERVAL:
+            self._traj_file.write(os.linesep)
+
         won = any(c[1] == self.__grid_y - 1 for c in self.__coords)
 
         state = np.array(list(map(self.__encode__, self.__coords)))
 
-        return state, self._REWARD * won, won, {}
-        # return state, self._REWARD * (2 * won) - 1, won, {}
+        rew = self._REWARD if won else 0
+        return state, rew, False, {}
