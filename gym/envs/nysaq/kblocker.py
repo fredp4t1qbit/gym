@@ -23,7 +23,7 @@ class KBlockerEnv(gym.Env):
         self.__num_bs = self.config['task']['num_blockers']
         self.__grid_y = self.config['task']['grid_y']
         self.__grid_x = self.__num_bs * 3 + 1
-        self.__i2t_actions = [(1,0), (-1,0), (0,-1), (0,1)]
+        self.__i2t_actions = [(1,0), (-1,0), (0,-1), (0,1)]  # right, left, back, forward
 
         self._reset()
         self._seed()
@@ -56,8 +56,10 @@ class KBlockerEnv(gym.Env):
 
         return var
 
+
     def __encode__(self, coord):
-        return coord[1] * self.__grid_x + coord[0];
+        return coord[1] * self.__grid_x + coord[0]
+
 
     def __coord_after__(self, action, coord):
         # a blocker is blocking (3 is up)
@@ -105,6 +107,10 @@ class KBlockerEnv(gym.Env):
         # Initialize the agents randomly
         self.__coords = [(r, 0) for r in random.sample(range(self.__grid_x), self.__num_bs + 1)]
 
+        return self._get_encoded_state()
+
+
+    def _get_encoded_state(self):
         return np.array(list(map(self.__encode__, self.__coords)))
 
     def _step(self, action):
@@ -113,7 +119,7 @@ class KBlockerEnv(gym.Env):
         # If won, stay for one move here (regardless of action), return no reward and declare win
         won_already = any(c[1] == self.__grid_y - 1 for c in self.__coords)
         if won_already:
-            state = np.array(list(map(self.__encode__, self.__coords)))
+            state = self._get_encoded_state()
             return state, 0, True, {}
 
         self.__ep_ctr += 1
@@ -135,7 +141,7 @@ class KBlockerEnv(gym.Env):
 
         won = any(c[1] == self.__grid_y - 1 for c in self.__coords)
 
-        state = np.array(list(map(self.__encode__, self.__coords)))
+        state = self._get_encoded_state()
 
         rew = self._REWARD if won else 0
         return state, rew, False, {}
