@@ -36,8 +36,8 @@ class KBlockerEnv(gym.Env):
         # 0: right, 1: left, 2: down, 3: up
         self.action_space = spaces.Discrete(self._NUM_ACTIONS ** (self.__num_bs + 1))
 
-        lows = np.array([0] * (self.__num_bs + 1))
-        highs = np.array([self.__grid_x * self.__grid_y] * (self.__num_bs + 1))
+        lows = np.array([0, 0] * (self.__num_bs + 1))
+        highs = np.array([self.__grid_x, self.__grid_y] * (self.__num_bs + 1))
         self.observation_space = spaces.Box(lows, highs)
 
     def __decode__action__(self, action):
@@ -111,7 +111,7 @@ class KBlockerEnv(gym.Env):
 
 
     def _get_encoded_state(self):
-        return np.array(list(map(self.__encode__, self.__coords)))
+        return sum(map(list, self.__coords), [])
 
     def _step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
