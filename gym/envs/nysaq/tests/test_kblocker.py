@@ -73,7 +73,9 @@ def test_winning(cc, action, exp_rew, exp_done):
     task._KBlockerEnv__coords = cc
     task._KBlockerEnv__gap = task._KBlockerEnv__grid_x - 1
     _, rew, done, _y = task.step(action)
-    assert task._REWARD == 5  # Hard coded in kblocker
+
+    assert task._WIN_REWARD == 5  # Loaded from Config
+    assert task._PLAY_REWARD == 0  # Loaded from Config
     assert rew == exp_rew
     assert done == exp_done
 

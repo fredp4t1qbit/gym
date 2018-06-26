@@ -30,7 +30,8 @@ class KBlockerEnv(gym.Env):
 
         self.__attacks = []
         self._NUM_ACTIONS = 4
-        self._REWARD = 5
+        self._WIN_REWARD = self.config['task']['win_reward']
+        self._PLAY_REWARD = self.config['task']['play_reward']
         self._MAX_EPISODE = 20
 
         # 0: right, 1: left, 2: down, 3: up
@@ -111,7 +112,16 @@ class KBlockerEnv(gym.Env):
 
 
     def _get_encoded_state(self):
-        return sum(map(list, self.__coords), [])
+        """
+        i.e.
+        >>> self.__coords
+                Out: [(2, 0), (1, 0)]
+        >>> self._get_encoded_state()
+                Out: (2, 0, 1, 0)
+
+        :return: a tuple of length 2x the number of blocks (which is the number of blockers + 1)
+        """
+        return sum(self.__coords, ())
 
     def _step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
@@ -143,5 +153,5 @@ class KBlockerEnv(gym.Env):
 
         state = self._get_encoded_state()
 
-        rew = self._REWARD if won else 0
+        rew = self._WIN_REWARD if won else self._PLAY_REWARD
         return state, rew, False, {}

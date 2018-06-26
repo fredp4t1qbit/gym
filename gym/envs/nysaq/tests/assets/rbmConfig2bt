@@ -24,7 +24,7 @@
     "name": "bt",
     "num_blockers": 2,
     "grid_y": 4,
-    "positive_reward": 1,
-    "negative_reward": 0
+    "win_reward": 5,
+    "play_reward": 0
   }
 }
