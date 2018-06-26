@@ -12,12 +12,24 @@ def get_k_blocker_env(fileName):
 
 
 @pytest.mark.parametrize("fileName,observations", [
-    ('rbmConfig1bt', Box(np.array([0,0]),np.array([20,20]))),
-    ('rbmConfig2bt', Box(np.array([0,0,0]),np.array([28,28,28])))
+    ('rbmConfig1bt', Box(np.array([0]*4),np.array([4,5]*2))),
+    ('rbmConfig2bt', Box(np.array([0]*6),np.array([7,4]*3)))
 ])
 def test_observation(fileName, observations):
     task = get_k_blocker_env(fileName)
     assert task.observation_space == observations
+
+
+def test_observation_dimensions():
+    fileName = 'rbmConfig1bt'
+    task = get_k_blocker_env(fileName)
+
+    step_obs = task.step(task.action_space.sample())
+    assert len(step_obs[0]) == task.observation_space.shape[0]
+    assert step_obs[1] == 0  # No reward because still in 1st or 2nd row
+
+    reset_obs = task.reset()
+    assert len(reset_obs) == task.observation_space.shape[0]
 
 
 @pytest.mark.parametrize("fileName,actions", [
@@ -50,7 +62,9 @@ def test_coords(cc, action, nc):
 
 # winning
 @pytest.mark.parametrize("cc, action, exp_rew, exp_done", [
-    ([(0,3),(3,3)], 15, 10, True)#action : (3,3)
+    ([(0,3),(3,3)], 15, 5, False),  #action : (3,3)
+    ([(0,3),(3,4)], 15, 0, True),  #action : (3,3)
+    ([(0,3),(3,4)], 8,  0, True)  #action : (2,2)
 ])
 def test_winning(cc, action, exp_rew, exp_done):
     fileName = 'rbmConfig1bt'
@@ -59,8 +73,10 @@ def test_winning(cc, action, exp_rew, exp_done):
     task._KBlockerEnv__coords = cc
     task._KBlockerEnv__gap = task._KBlockerEnv__grid_x - 1
     _, rew, done, _y = task.step(action)
+    assert task._REWARD == 5  # Hard coded in kblocker
     assert rew == exp_rew
     assert done == exp_done
+
 
 # defend
 @pytest.mark.parametrize("cc, action, exp_rew, exp_done", [
