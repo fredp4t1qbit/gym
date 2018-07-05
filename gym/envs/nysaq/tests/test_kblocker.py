@@ -10,17 +10,16 @@ def get_k_blocker_env(fileName):
     task = KBlockerEnv(config_path)
     return task
 
-
 @pytest.mark.parametrize("fileName,observations", [
     ('rbmConfig1bt', Box(np.array([0]*4),np.array([4,5]*2))),
     ('rbmConfig2bt', Box(np.array([0]*6),np.array([7,4]*3)))
 ])
-def test_observation(fileName, observations):
+def test_k_blocker_observation(fileName, observations):
     task = get_k_blocker_env(fileName)
     assert task.observation_space == observations
 
 
-def test_observation_dimensions():
+def test_k_blocker_observation_dimensions():
     fileName = 'rbmConfig1bt'
     task = get_k_blocker_env(fileName)
 
@@ -36,7 +35,7 @@ def test_observation_dimensions():
     ('rbmConfig1bt', Discrete(16)),
     ('rbmConfig2bt', Discrete(64))
 ])
-def test_actions(fileName, actions):
+def test_k_blocker_actions(fileName, actions):
     task = get_k_blocker_env(fileName)
     assert task.action_space == actions
 
@@ -51,7 +50,7 @@ def test_actions(fileName, actions):
     ([(1,1),(2,1)], 4, [(1,1),(2,1)]),  #action: [0,1]
     ([(0,3),(3,3)], 15, [(0,3),(3,4)])  #action: [3,3] The blocker is on the left
 ])
-def test_coords(cc, action, nc):
+def test_k_blocker_coords(cc, action, nc):
     fileName = 'rbmConfig1bt'
     task = get_k_blocker_env(fileName)
 
@@ -66,7 +65,7 @@ def test_coords(cc, action, nc):
     ([(0,3),(3,4)], 15, 0, True),  #action : (3,3)
     ([(0,3),(3,4)], 8,  0, True)  #action : (2,2)
 ])
-def test_winning(cc, action, exp_rew, exp_done):
+def test_k_blocker_winning(cc, action, exp_rew, exp_done):
     fileName = 'rbmConfig1bt'
     task = get_k_blocker_env(fileName)
 
@@ -85,7 +84,7 @@ def test_winning(cc, action, exp_rew, exp_done):
     ([(0,3),(2,3)], 15, 0, False),#action : (3,3)
     ([(1,3),(3,3)], 15, 0, False)#action : (3,3)
 ])
-def test_defending(cc, action, exp_rew, exp_done):
+def test_k_blocker_defending(cc, action, exp_rew, exp_done):
     fileName = 'rbmConfig1bt'
     task = get_k_blocker_env(fileName)
 

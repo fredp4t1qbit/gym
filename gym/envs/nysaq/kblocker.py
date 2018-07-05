@@ -13,19 +13,12 @@ class KBlockerEnv(gym.Env):
 
         self.__ep_ctr = 0
 
-        # Every _SAMPLE_TRAJ_INTERVAL episodes, print one.
-        self._PRINT_TRAJ_SAMPLES = False
-        if self._PRINT_TRAJ_SAMPLES:
-            self._traj_file = open('trajs.txt', 'w')
-        self._SAMPLE_TRAJ_INTERVAL = 100
-        self.__traj_sample_ctr = -1
-
         self.__num_bs = self.config['task']['num_blockers']
         self.__grid_y = self.config['task']['grid_y']
         self.__grid_x = self.__num_bs * 3 + 1
         self.__i2t_actions = [(1,0), (-1,0), (0,-1), (0,1)]  # right, left, back, forward
 
-        self._reset()
+        self.reset()
         self._seed()
 
         self.__attacks = []
@@ -39,7 +32,7 @@ class KBlockerEnv(gym.Env):
 
         lows = np.array([0, 0] * (self.__num_bs + 1))
         highs = np.array([self.__grid_x, self.__grid_y] * (self.__num_bs + 1))
-        self.observation_space = spaces.Box(lows, highs)
+        self.observation_space = spaces.Box(lows, highs, dtype=np.int32)
 
     def __decode__action__(self, action):
         var = []
@@ -57,10 +50,8 @@ class KBlockerEnv(gym.Env):
 
         return var
 
-
     def __encode__(self, coord):
         return coord[1] * self.__grid_x + coord[0]
-
 
     def __coord_after__(self, action, coord):
         # a blocker is blocking (3 is up)
@@ -93,15 +84,8 @@ class KBlockerEnv(gym.Env):
         random.seed(seed)
         return seed
 
-    def _reset(self):
+    def reset(self):
         self.__ep_ctr = 0
-
-        if self._PRINT_TRAJ_SAMPLES and not self.__traj_sample_ctr % self._SAMPLE_TRAJ_INTERVAL:
-            self._traj_file.write('-----------------')
-            self._traj_file.write(os.linesep)
-            self._traj_file.flush()
-
-        self.__traj_sample_ctr += 1
 
         self.__gap = 0
 
@@ -123,7 +107,7 @@ class KBlockerEnv(gym.Env):
         """
         return sum(self.__coords, ())
 
-    def _step(self, action):
+    def step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         # If won, stay for one move here (regardless of action), return no reward and declare win
@@ -142,12 +126,6 @@ class KBlockerEnv(gym.Env):
         sep_actions = self.__decode__action__(action)
         for i in range(len(self.__coords)):
             self.__coords[i] = self.__coord_after__(sep_actions[i], self.__coords[i])
-
-            if self._PRINT_TRAJ_SAMPLES and not self.__traj_sample_ctr % self._SAMPLE_TRAJ_INTERVAL:
-                self._traj_file.write(str(self.__coords[i]) + ' # ')
-
-        if self._PRINT_TRAJ_SAMPLES and not self.__traj_sample_ctr % self._SAMPLE_TRAJ_INTERVAL:
-            self._traj_file.write(os.linesep)
 
         won = any(c[1] == self.__grid_y - 1 for c in self.__coords)
 
