@@ -17,9 +17,9 @@ if __name__ == "__main__":
 
     # parent parser for solvers
     parser_solver = argparse.ArgumentParser(add_help=False)
-    parser_solver.add_argument("-problem", type=str, default="sample_data/graph187",
+    parser_solver.add_argument("-problem", type=str, default="sample_data/503_pm_nf_0000.txt",
                                help="a file containing problem data in three column format, see README for details")
-    parser_solver.add_argument("-steps", type=int, default=10000,
+    parser_solver.add_argument("-steps", type=int, default=1000000,
                                help="number of monte carlo steps (MCS) used, good values depend on problem size")
     parser_solver.add_argument("-dump", type=str, default=None,
                                help="a file to dump move acceptances to, if desired -- slows down performance")

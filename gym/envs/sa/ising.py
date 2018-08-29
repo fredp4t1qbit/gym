@@ -17,7 +17,7 @@ class SpinGlass(object):
 
     def __init__(self,
                  # data_file="sample_data/ising32.txt",
-                 data_file="sample_data/graph187",
+                 data_file="sample_data/503_pm_nf_0000.txt",
                  spin_configuration=None):
         """Process a data file and optionally a starting spin configuration
 
