@@ -111,6 +111,8 @@ class KBlockerEnv(gym.Env):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         # If won, stay for one move here (regardless of action), return no reward and declare win
+        # This extra step is catastrophic for R-learning. It can be adjusted
+        # by commenting in/out the return line. 
         won_already = any(c[1] == self.__grid_y - 1 for c in self.__coords)
         if won_already:
             state = self._get_encoded_state()
@@ -132,4 +134,5 @@ class KBlockerEnv(gym.Env):
         state = self._get_encoded_state()
 
         rew = self._WIN_REWARD if won else self._PLAY_REWARD
-        return state, rew, False, {}
+        return state, rew, won, {}
+        #return state, rew, False, {}
